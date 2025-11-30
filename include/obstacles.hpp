@@ -14,11 +14,13 @@ public:
 
     virtual void update(GameState&);
     sf::Vector2f getPosition() const { return position; }
+    sf::FloatRect getBoundingBox() const { return { position.x, position.y - size.y, size.x, size.y }; }
 
 protected:
     virtual void draw(sf::RenderTarget&, sf::RenderStates) const;
 
     sf::Vector2f position = { 600.f, 180.f };
+    sf::Vector2f size { 0.f, 0.f };
     SpriteType currentSprite;
 
     SpriteManager& spriteManager;
@@ -61,10 +63,6 @@ public:
 
 private:
     int timeElapsedSinceLastObstacleMs = 0;
-
-    sf::Vector2f smallCactusSize;
-    sf::Vector2f largeCactusSize;
-    sf::Vector2f birdSize;
 
     SpriteManager& spriteManager;
 
