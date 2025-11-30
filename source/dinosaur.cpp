@@ -40,7 +40,7 @@ void Dinosaur::update(GameState& gameState)
 
     if (currentJumpHight > 0.f)
     {
-        currentJumpSpeed -= 0.4f;
+        currentJumpSpeed -= GravitationalAcceleration;
         currentSprite = SpriteType::DinosaurStanding;
         return;
     }
@@ -54,7 +54,7 @@ void Dinosaur::update(GameState& gameState)
 
 sf::FloatRect Dinosaur::getBoundingBox() const
 {
-    return { position, size };
+    return { position.x, position.y - size.y, size.x, size.y };
 }
 
 void Dinosaur::draw(sf::RenderTarget& target, sf::RenderStates) const

@@ -5,8 +5,8 @@ void GameOverScreen::configure(Config& config)
     text.setString("GAME OVER");
     text.setFillColor(sf::Color::Black);
     
-    auto globalBounds = text.getGlobalBounds();
-    text.setOrigin(globalBounds.width / 2.f, globalBounds.height / 2.f);
+    auto bounds = text.getLocalBounds();
+    text.setOrigin(bounds.left + bounds.width / 2.f, bounds.top + bounds.height / 2.f);
     text.setPosition(config.WindowWidth / 2, config.WindowHeight / 2);
 }
 

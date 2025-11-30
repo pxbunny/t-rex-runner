@@ -2,10 +2,12 @@
 
 void Obstacle::update(GameState& gameState)
 {
+    const float obstacleSpeed = 8.f;
+
     if (gameState.getState() != GameState::State::Running)
         return;
 
-    position.x -= 8.f;
+    position.x -= obstacleSpeed;
 }
 
 void Obstacle::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -60,37 +62,40 @@ void ObstacleManager::generateRandomObstacle()
     switch (rand() % 3)
     {
     case 0:
-        obstacles.push(new ObstacleSmallCactus(spriteManager));
+        obstacles.push_back(std::make_unique<ObstacleSmallCactus>(spriteManager));
         break;
     case 1:
-        obstacles.push(new ObstacleLargeCactus(spriteManager));
+        obstacles.push_back(std::make_unique<ObstacleLargeCactus>(spriteManager));
         break;
     case 2:
-        obstacles.push(new ObstacleBird(spriteManager));
+        obstacles.push_back(std::make_unique<ObstacleBird>(spriteManager));
         break;
     }
 }
 
 void ObstacleManager::popObstacle()
 {
-    delete obstacles.front();
-    obstacles.pop();
+    obstacles.pop_front();
 }
 
 void ObstacleManager::removeAllObstacles()
 {
-    for (size_t i = 0; i < obstacles.size(); i++)
-        popObstacle();
+    obstacles.clear();
 }
 
 void ObstacleManager::updateObstacles(GameState& gameState)
 {
-    if (gameState.getState() == GameState::State::Start)
+    auto state = gameState.getState();
+
+    if (state == GameState::State::Start)
     {
         removeAllObstacles();
-        timeElapsedSinceLastObstacleMs = 0;
+        timeElapsedSinceLastObstacleMs = gameState.getInGameTimeMs();
         return;
     }
+
+    if (state != GameState::State::Running)
+        return;
 
     auto elapsedTime = gameState.getInGameTimeMs();
 
@@ -103,29 +108,17 @@ void ObstacleManager::updateObstacles(GameState& gameState)
     if (obstacles.empty())
         return;
 
-    for (size_t i = 0; i < obstacles.size(); i++)
-    {
-        auto obstacle = obstacles.front();
-        obstacles.pop();
+    for (auto& obstacle : obstacles)
         obstacle->update(gameState);
-        obstacles.push(obstacle);
-    }
 
-    if (obstacles.front()->getPosition().x < -200.f)
-    {
+    while (!obstacles.empty() && obstacles.front()->getPosition().x < -200.f)
         popObstacle();
-    }
 }
 
 void ObstacleManager::drawObstacles(sf::RenderTarget& target)
 {
-    for (size_t i = 0; i < obstacles.size(); i++)
-    {
-        auto obstacle = obstacles.front();
-        obstacles.pop();
+    for (auto& obstacle : obstacles)
         target.draw(*obstacle);
-        obstacles.push(obstacle);
-    }
 }
 
 bool ObstacleManager::isColliding(sf::FloatRect boundingBox)
@@ -133,19 +126,24 @@ bool ObstacleManager::isColliding(sf::FloatRect boundingBox)
     if (obstacles.empty())
         return false;
 
-    auto obstacle = obstacles.front();
-    auto position = obstacle->getPosition();
-    auto size = sf::Vector2f();
+    for (const auto& obstacle : obstacles)
+    {
+        auto position = obstacle->getPosition();
+        auto size = sf::Vector2f();
 
-    if (typeid(*obstacle) == typeid(ObstacleBird))
-        size = birdSize;
-    else if (typeid(*obstacle) == typeid(ObstacleSmallCactus))
-        size = smallCactusSize;
-    else if (typeid(*obstacle) == typeid(ObstacleLargeCactus))
-        size = largeCactusSize;
-    else
-        return false;
+        if (typeid(*obstacle) == typeid(ObstacleBird))
+            size = birdSize;
+        else if (typeid(*obstacle) == typeid(ObstacleSmallCactus))
+            size = smallCactusSize;
+        else if (typeid(*obstacle) == typeid(ObstacleLargeCactus))
+            size = largeCactusSize;
+        else
+            continue;
 
-    auto obstacleBoundingBox = sf::FloatRect(position, size);
-    return obstacleBoundingBox.intersects(boundingBox);
+        sf::FloatRect obstacleBoundingBox(position.x, position.y - size.y, size.x, size.y);
+        if (obstacleBoundingBox.intersects(boundingBox))
+            return true;
+    }
+
+    return false;
 }

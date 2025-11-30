@@ -16,7 +16,7 @@ Config config = {
 
     // COLORS //
 
-    8u,                 // bits per pixel
+    32u,                // bits per pixel
 
 
     // GAME //

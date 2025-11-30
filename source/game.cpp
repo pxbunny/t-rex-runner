@@ -11,8 +11,6 @@ Game::Game(Config& config) : config(config)
     auto style = sf::Style::Titlebar | sf::Style::Close;
     window.create(mode, config.WindowTitle, style);
     window.setFramerateLimit(config.FramerateLimit);
-
-    hud.configure(config);
 }
 
 LoadingFilesResult Game::loadFiles(Config& config)
@@ -105,9 +103,6 @@ void Game::update()
 
     if (obstacleManager.isColliding(dinosaur.getBoundingBox()))
         gameState.setState(GameState::State::Dead);
-
-    if (gameState.getState() == GameState::State::Start && gameState.getHighestScore() > 0)
-        gameState.setState(GameState::State::Running);
 }
 
 void Game::draw()

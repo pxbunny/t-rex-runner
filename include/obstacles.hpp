@@ -1,7 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <queue>
+#include <deque>
+#include <memory>
 
 #include "sprites.hpp"
 #include "state.hpp"
@@ -59,7 +60,7 @@ public:
     bool isColliding(sf::FloatRect boundingBox);
 
 private:
-    int timeElapsedSinceLastObstacleMs = -4000; // TODO: update logic
+    int timeElapsedSinceLastObstacleMs = 0;
 
     sf::Vector2f smallCactusSize;
     sf::Vector2f largeCactusSize;
@@ -67,5 +68,5 @@ private:
 
     SpriteManager& spriteManager;
 
-    std::queue<Obstacle*> obstacles;
+    std::deque<std::unique_ptr<Obstacle>> obstacles;
 };

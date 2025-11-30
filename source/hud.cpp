@@ -18,12 +18,12 @@ std::string getFullScoreString(int score, int highestScore)
 
 void ScoreDisplay::configure(Config& config)
 {
-    auto globalBounds = text.getGlobalBounds();
-    text.setOrigin(globalBounds.width, 0.f);
-
     text.setFillColor(sf::Color::Black);
     text.setCharacterSize(14);
+
     text.setString(getFullScoreString(score, highestScore));
+    auto bounds = text.getLocalBounds();
+    text.setOrigin(bounds.left + bounds.width, bounds.top);
 
     auto windowWidth = config.WindowWidth;
     auto windowPadding = config.WindowPadding;
@@ -34,6 +34,8 @@ void ScoreDisplay::update(GameState &gameState)
 {
     auto scoreString = getFullScoreString(gameState.getScore(), gameState.getHighestScore());   
     text.setString(scoreString);
+    auto bounds = text.getLocalBounds();
+    text.setOrigin(bounds.left + bounds.width, bounds.top);
 }
 
 void ScoreDisplay::setFont(sf::Font& font)
