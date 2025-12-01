@@ -1,4 +1,6 @@
 #include "obstacles.hpp"
+#include <cstdlib>
+#include <ctime>
 
 void Obstacle::update(GameState& gameState)
 {
@@ -49,7 +51,7 @@ void ObstacleBird::update(GameState& gameState)
 
 ObstacleManager::ObstacleManager(SpriteManager& spriteManager) : spriteManager(spriteManager)
 {
-
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
 }
 
 ObstacleManager::~ObstacleManager()
@@ -86,7 +88,7 @@ void ObstacleManager::removeAllObstacles()
 void ObstacleManager::updateObstacles(GameState& gameState)
 {
     const int spawnIntervalMs = 5000;
-    const int despawnXPosition = -200.f;
+    const float despawnXPosition = -200.f;
 
     auto state = gameState.getState();
 
